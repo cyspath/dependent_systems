@@ -44,6 +44,9 @@ function installProgram(name, current) {
     installProgram(dependencies[i]);
   }
   console.log(`    Installing ${name}`);
+  if (current) {
+    hash[name].explictInstall = true;
+  }
   hash[name].installed = true;
 }
 
@@ -63,7 +66,7 @@ function removeProgram(name, current) {
   console.log(`    Removing ${name}`);
   // remove its dependencies which are not used
   for (var key in hash[name].dependencies) {
-    if (hash[name].dependencies[key].installed) {
+    if (hash[name].dependencies[key].installed && hash[name].dependencies[key].explictInstall === false) {
       removeProgram(key, false);
     }
   }
@@ -106,40 +109,32 @@ function run(cmds) {
 
 }
 
-// simple tests:
-function runTests() {
-  (function () {
-    var cmds = ['DEPEND TELNET TCPIP NETCARD',
 
-    ]
-  })()
+var cmds = [
+  'DEPEND TELNET TCPIP NETCARD',
+  'DEPEND TCPIP NETCARD',
+  'DEPEND DNS TCPIP NETCARD',
+  'DEPEND BROWSER TCPIP HTML',
+  'INSTALL NETCARD',
+  'INSTALL TELNET',
+  'INSTALL foo',
+  'REMOVE NETCARD',
+  'INSTALL BROWSER',
+  'INSTALL DNS',
+  'LIST',
+  'REMOVE TELNET',
+  'REMOVE NETCARD',
+  'REMOVE DNS',
+  'REMOVE NETCARD',
+  'INSTALL NETCARD',
+  'REMOVE TCPIP',
+  'REMOVE BROWSER',
+  'REMOVE TCPIP',
+  'LIST',
+  'END',
+  'REMOVE NETCARD',
+]
 
-}
+run(cmds);
 
-//
-// var cmds = [
-//   'DEPEND TELNET TCPIP NETCARD',
-//   'DEPEND TCPIP NETCARD',
-//   'DEPEND DNS TCPIP NETCARD',
-//   'DEPEND BROWSER TCPIP HTML',
-//   'INSTALL NETCARD',
-//   'INSTALL TELNET',
-//   'INSTALL foo',
-//   'REMOVE NETCARD',
-//   'INSTALL BROWSER',
-//   'INSTALL DNS',
-//   'LIST',
-//   'REMOVE TELNET',
-//   'REMOVE NETCARD',
-//   'REMOVE DNS',
-//   'REMOVE NETCARD',
-//   'INSTALL NETCARD',
-//   'REMOVE TCPIP',
-//   'REMOVE BROWSER',
-//   'REMOVE TCPIP',
-//   'LIST',
-//   'END',
-//   'REMOVE NETCARD',
-// ]
-//
-// run(cmds);
+console.log(hash);
